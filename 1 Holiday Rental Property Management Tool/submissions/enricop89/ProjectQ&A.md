@@ -75,7 +75,7 @@ Based on `There are 5 initial users with between 2 and 14 rental properties each
 
 2. What is the most expensive component of your application?
 
-Probably Cloudwatch Logs but I need to run the numbers to get a specific estimation 
+Probably Cloudwatch Logs but I need to run the numbers to get a specific estimation
 
 3. What designs/patterns have been implemented to optimise costs?
 
@@ -85,13 +85,11 @@ Serverless with Event based Architecture
 
 How does your architecture make the most of user usage patterns to improve sustainability?
 
-
-
 # Project specific questions
 
 1. How accurate is your scheduling method? If a visitor gets there but still hasn’t been sent the key lock code then they’ll be very annoyed. (DynamoDB TTL method for scheduling is only guaranteed to 48 hours)
 
-Since I'm using Event bridge scheduler the accuray is around one minute. 
+Since I'm using Event bridge scheduler the accuray is around one minute.
 
 2. What if the email to the cleaning crew fails to send? Have you overwritten the current code so no-one can unlock the key box?
 
@@ -99,28 +97,48 @@ Ideally, the Lambda function that send the email to the crew, will overwrite the
 
 3. If you’ve used DynamoDB, what is your schema so that you can effectively query the bookings by property or by owner?
 
-The idea is to use Single Table design and the design is the following. Primary Key PK and Sort Key SK have general names so there will be key overloading
+The idea is to use Single Table design and the design is the following. Primary Key PK and Sort Key SK have general names so there will be key overloading. The first thing to do is to think about access patterns. The main ones are:
+
+- Get Owners Profile
+- Get Owners Properties
+- Get Property Details
+- Get Reservations Details
+- Get All Reservations per Property
+- Get Reservation by Guest
+- Get Reservations by Start/End Date
+- Get Reservation by Id
 
 (think about access pattern)
 
-|-----|-----|-----| ------ | 
-| Entity | PK | SK | Attributes
-| Owner| OWNER_EMAIL#<email> | OWNER_EMAIL#<email>| 
-| Owner| OWNER_EMAIL#<email> | OWNER_EMAIL#<email>| 
-
+| Entity              | PK                        | SK                                  | Attributes          | Query Example |
+|---------------------|---------------------------|-------------------------------------|---------------------|---------------|
+| OWNER               | OWNER_EMAIL#\<email>      | OWNER_EMAIL#\<email>                | {Owner attributes}  | PK and SK are owner email |
+| RESERVATION         | RESERVATION_ID#\<id>      | RESERVATION_ID#START_DATE#\<startDate> | {Reservation attributes} | Specify reservation Id to get single reservation OR specify startDate to get all reservations per property PK = RESERVATION#\<ReservationID> AND SK BETWEEN 'START_DATE#\<date>' AND 'START_DATE#\<date>' |
+| OWNER PROPERTIES    | OWNER_EMAIL#\<email>      | PROPERTY_ID#\<id>                   | {Owner Properties attributes} | PK: Owner email and returns all properties by owner's email |
+| PROPERTY            | PROPERTY#\<id>            | PROPERTY#\<id>                      | {Property attributes} | PK and SK are property Id |
+| PROPERTY RESERVATIONS | PROPERTY#\<id>          | RESERVATION_ID#\<id>                | {Property Reservations attributes} | PK is Property Id and returns all reservations by property Id |
+| GUEST               | GUEST#\<email>            | GUEST#\<email>                      | {Guest attributes}   | PK and SK are guest email |
 
 4. What ongoing maintenance tasks are there to maintain this app? Is this too much for the founder to handle on their own?
 
+There shouldn't be any huge maintance processes.
+
 5. How are you ensuring that one of the rental owners can’t access the properties and data of another owner?
-   At the requested scale the application might be over 300,000 bookings a year (400 owners, 15 properties, 50 bookings per year). How does your architecture handle this? Take note of limits in your email service provider and auth platform.
+
+I am using different User Pools in Cognito to separate auths.
+
+6. At the requested scale the application might be over 300,000 bookings a year (400 owners, 15 properties, 50 bookings per year). How does your architecture handle this? Take note of limits in your email service provider and auth platform.
+
+From APIs and storage point of view, it's fully scalable based on load. Email provider should be adaptable as well and auth provider is not a problem (AWS Cognito)
 
 6. You are asked to add a feature. When there is a cancellation or a booking slot that has not been booked, the owner wants a button to send an email to all people who have previously stayed there. How complicated would it be to extend your current architecture to handle this?
 
+Since the architecture is event based, it shouldn't take too much time. When a cancellation is triggered, I can send an email based on that event
 
-7. A hotel chain hears about the app. They have 80 hotels, each with around 400 rooms. The hotel chain needs more fine access control. They need three new roles: chain manager, hotel manager and hotel employee.
+7. A hotel chain hears about the app. They have 80 hotels, each with around 400 rooms. The hotel chain needs more fine access control. They need three new roles: chain manager, hotel manager and hotel employee. How complicated would it be to extend your current architecture to handle this?
 
-
-8. How complicated would it be to extend your current architecture to handle this?
-
+I can create a sort of Access Control list and user roles with Cognito but need to explore the details
 
 9. Are there any known limitations in your current architecture that could become an issue with increased scale?
+
+There shouldn't be.
