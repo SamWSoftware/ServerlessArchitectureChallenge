@@ -108,16 +108,14 @@ The idea is to use Single Table design and the design is the following. Primary 
 - Get Reservations by Start/End Date
 - Get Reservation by Id
 
-(think about access pattern)
-
-| Entity              | PK                        | SK                                  | Attributes          | Query Example |
-|---------------------|---------------------------|-------------------------------------|---------------------|---------------|
-| OWNER               | OWNER_EMAIL#\<email>      | OWNER_EMAIL#\<email>                | {Owner attributes}  | PK and SK are owner email |
-| RESERVATION         | RESERVATION_ID#\<id>      | RESERVATION_ID#START_DATE#\<startDate> | {Reservation attributes} | Specify reservation Id to get single reservation OR specify startDate to get all reservations per property PK = RESERVATION#\<ReservationID> AND SK BETWEEN 'START_DATE#\<date>' AND 'START_DATE#\<date>' |
-| OWNER PROPERTIES    | OWNER_EMAIL#\<email>      | PROPERTY_ID#\<id>                   | {Owner Properties attributes} | PK: Owner email and returns all properties by owner's email |
-| PROPERTY            | PROPERTY#\<id>            | PROPERTY#\<id>                      | {Property attributes} | PK and SK are property Id |
-| PROPERTY RESERVATIONS | PROPERTY#\<id>          | RESERVATION_ID#\<id>                | {Property Reservations attributes} | PK is Property Id and returns all reservations by property Id |
-| GUEST               | GUEST#\<email>            | GUEST#\<email>                      | {Guest attributes}   | PK and SK are guest email |
+| Entity                | PK                   | SK                                     | Attributes                         | Query Example                                                                                                                                                                                             |
+| --------------------- | -------------------- | -------------------------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| OWNER                 | OWNER_EMAIL#\<email> | OWNER_EMAIL#\<email>                   | {Owner attributes}                 | PK and SK are owner email                                                                                                                                                                                 |
+| RESERVATION           | RESERVATION_ID#\<id> | RESERVATION_ID#START_DATE#\<startDate> | {Reservation attributes}           | Specify reservation Id to get single reservation OR specify startDate to get all reservations per property PK = RESERVATION#\<ReservationID> AND SK BETWEEN 'START_DATE#\<date>' AND 'START_DATE#\<date>' |
+| OWNER PROPERTIES      | OWNER_EMAIL#\<email> | PROPERTY_ID#\<id>                      | {Owner Properties attributes}      | PK: Owner email and returns all properties by owner's email                                                                                                                                               |
+| PROPERTY              | PROPERTY#\<id>       | PROPERTY#\<id>                         | {Property attributes}              | PK and SK are property Id                                                                                                                                                                                 |
+| PROPERTY RESERVATIONS | PROPERTY#\<id>       | RESERVATION_ID#\<id>                   | {Property Reservations attributes} | PK is Property Id and returns all reservations by property Id                                                                                                                                             |
+| GUEST                 | GUEST#\<email>       | GUEST#\<email>                         | {Guest attributes}                 | PK and SK are guest email                                                                                                                                                                                 |
 
 4. What ongoing maintenance tasks are there to maintain this app? Is this too much for the founder to handle on their own?
 
@@ -131,11 +129,11 @@ I am using different User Pools in Cognito to separate auths.
 
 From APIs and storage point of view, it's fully scalable based on load. Email provider should be adaptable as well and auth provider is not a problem (AWS Cognito)
 
-6. You are asked to add a feature. When there is a cancellation or a booking slot that has not been booked, the owner wants a button to send an email to all people who have previously stayed there. How complicated would it be to extend your current architecture to handle this?
+7. You are asked to add a feature. When there is a cancellation or a booking slot that has not been booked, the owner wants a button to send an email to all people who have previously stayed there. How complicated would it be to extend your current architecture to handle this?
 
 Since the architecture is event based, it shouldn't take too much time. When a cancellation is triggered, I can send an email based on that event
 
-7. A hotel chain hears about the app. They have 80 hotels, each with around 400 rooms. The hotel chain needs more fine access control. They need three new roles: chain manager, hotel manager and hotel employee. How complicated would it be to extend your current architecture to handle this?
+8. A hotel chain hears about the app. They have 80 hotels, each with around 400 rooms. The hotel chain needs more fine access control. They need three new roles: chain manager, hotel manager and hotel employee. How complicated would it be to extend your current architecture to handle this?
 
 I can create a sort of Access Control list and user roles with Cognito but need to explore the details
 
