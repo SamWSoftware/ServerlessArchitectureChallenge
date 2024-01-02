@@ -19,3 +19,9 @@ This pattern demonstrates how to automate the setup and deployment of a sample a
 6. As a fully managed database solution, Amazon Dynamo DB provides fast, consistent, performance as the data layer for your web application.
 
 7. Stripe offers both the ability to make instant payments for direct bookings. When a purchase is successfully completed, Stripe will notify you using a web hook that you define. 
+
+8. Dynamo DB Stream has been configured for syncing booking creation, deletion and updation details to the third party rental platforms using Lambda. Similarly, when visitor book through one of the tird party platform, it will be updated in Dynamo DB using webhook url.
+
+9. Eventbridge scheduler has been configured for completing scheduling tasks (for booking cleaners, remainder email before 10 days of reservation, accessing and chaging the access code key.
+
+10. All emails will be triggered using Amazon SES.
